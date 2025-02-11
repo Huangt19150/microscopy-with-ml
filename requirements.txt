@@ -12,6 +12,7 @@ tifffile==2025.1.10
 # scikit-image==0.21.0
 
 # Deep Learning Utilities
+pandas==2.2.3
 # tqdm==4.66.1
 matplotlib==3.10.0
 # seaborn==0.12.2
