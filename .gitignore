@@ -173,5 +173,11 @@ cython_debug/
 # ML datasets
 data/
 
+# ML artifacts
+artifacts/
+
 # Mac
 .DS_Store
+
+# Extra utils
+notebooks/utils
