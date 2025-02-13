@@ -170,14 +170,20 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# Mac
+.DS_Store
+
 # ML datasets
 data/
 
 # ML artifacts
 artifacts/
 
-# Mac
-.DS_Store
+# ML models
+models/
 
 # Extra utils
 notebooks/utils
+
+# Figures
+figures/

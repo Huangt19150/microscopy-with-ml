@@ -4,14 +4,14 @@ python-box==7.3.2
 
 # Core ML libraries
 torch==2.6.0
-# torchvision==0.16.2
+torchvision==0.21.0
 # torchaudio==2.1.2  # Optional, useful for some experiments
 numpy==2.2.2
 # scipy==1.11.4
 
 # Image Processing
 tifffile==2025.1.10
-# opencv-python==4.8.1.78
+opencv-python==4.11.0.86
 # Pillow==10.0.1
 scikit-image==0.25.1
 
@@ -30,6 +30,7 @@ ipykernel==6.29.5
 # jupyterlab==4.0.9
 
 # Optional: For segmentation tasks
+segmentation-models-pytorch==0.4.0
 # monai==1.2.0  # Medical image processing
 # segment-anything==1.0  # Meta's SAM model
 
