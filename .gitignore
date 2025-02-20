@@ -182,8 +182,9 @@ artifacts/
 # ML models
 models/
 
-# Extra utils
-notebooks/utils
+# ML logs
+runs/
+mlruns/
 
 # Figures
 figures/
