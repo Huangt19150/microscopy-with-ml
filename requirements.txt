@@ -38,3 +38,9 @@ segmentation-models-pytorch==0.4.0
 
 # Optional: For explainability (Grad-CAM)
 # torchcam==0.4.0
+
+# Local packages
+-e .
+
+# 
+ensure==1.0.4
