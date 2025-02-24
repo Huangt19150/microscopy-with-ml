@@ -182,9 +182,5 @@ artifacts/
 # ML models
 models/
 
-# ML logs
-runs/
-mlruns/
-
 # Figures
 figures/

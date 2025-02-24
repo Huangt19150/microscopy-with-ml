@@ -1,0 +1,16 @@
+{
+    "network": "unet_resnet34_2ch",
+    "dataset": "seg_2ch",
+    "loss": "weighted_dice_bce_2ch",
+    "weighted_dice_bce_2ch": {
+        "weight_1": 4.0,
+        "weight_2": 333.3,
+        "weight_3": 1.0,
+        "bce_weight": 1.0
+    },
+    "optimizer": "adam",
+    "learning_rate": 1e-4,
+    "metrics_logger": "metrics_logger_2ch",
+    "batch_size": 20,
+    "epochs": 1
+}
