@@ -1,3 +1,5 @@
+import os
+import cv2
 import numpy as np
 from skimage import measure
 from skimage.morphology import dilation, footprint_rectangle
@@ -71,3 +73,14 @@ def get_gt_mask_png(label, dilation_size_1=1, dilation_size_2=1, dilation_size_3
         pass
 
     return png
+
+
+def read_image_png(image_path):
+    if not os.path.exists(image_path):
+        print(f"File not found: {image_path}")
+    else:
+        image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+        if image is None:
+            print(f"OpenCV could not read: {image_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+    return image

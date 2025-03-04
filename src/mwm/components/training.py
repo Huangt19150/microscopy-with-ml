@@ -8,6 +8,7 @@ from mwm import logger
 
 # Model architecture
 import segmentation_models_pytorch as smp
+from mwm.components.model_architecture import *
 
 # Dataset
 from mwm.components.dataset import *
@@ -30,37 +31,22 @@ class Training:
         self.config = read_yaml(config_filepath)
         self.params = load_json(params_filepath)
 
+        # Make model
+        self.model = make_model(self.params.network)
 
-    def make_model(self):
-        if self.params.network == "unet_resnet34_2ch":
-            self.model = smp.Unet(encoder_name="resnet34", encoder_weights="imagenet", in_channels=3, classes=2)
-            logger.info(f"Model: {self.params.network} successfully created. ")
-        else:
-            logger.error(f"Invalid network: {self.params.network}")
-            raise ValueError(f"Invalid network: {self.params.network}")
-    
+        # Make dataset
+        self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
+        self.mask_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir)
+        # TODO: update with cross-validation
+        with open(os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.training_set_file), "r") as f:
+            self.image_list_train = f.read().splitlines()
+        self.train_dataset = make_dataset(self.params.dataset, self.image_dir, self.mask_dir, self.image_list_train)
+
 
     def handle_device(self):
         # Move model to GPU if available
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = self.model.to(self.device)
-
-
-    def make_dataset(self):
-        if self.params.dataset == "seg_2ch":
-            # TODO: update with cross-validation
-            with open("data/metadata/training.txt", "r") as f:
-                image_list_train = f.read().splitlines()
-
-            self.train_dataset = Seg2ChannelDataset(
-                image_dir=os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir), 
-                mask_dir=os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir), 
-                image_list=image_list_train
-            )
-            logger.info(f"Dataset: {self.params.dataset} successfully processed. ")
-        else:
-            logger.error(f"Invalid dataset: {self.params.dataset}")
-            raise ValueError(f"Invalid dataset: {self.params.dataset}")
     
 
     def make_criterion(self):
@@ -133,6 +119,7 @@ class Training:
 
         # Start training
         with mlflow.start_run():
+            mlflow.set_experiment("Training")
             for epoch in range(self.params.epochs):
                 self.this_epoch = epoch
                 self.train_epoch()

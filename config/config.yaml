@@ -11,7 +11,13 @@ data_ingestion:
 dataset:
   image_dir: norm_images
   mask_dir: masks
+  training_set_file: metadata/training.txt
+  test_set_file: metadata/test.txt
 
 
 model:
   model_dir: artifacts/models
+
+
+evaluation:
+  evaluation_dir: artifacts/evaluation

@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/thuang/Documents/Personal/code/microscopy-with-ml/mlruns/395929558851043676/1918181b354b4a0b98c08f764715ed52/artifacts
+end_time: 1741086066899
+entry_point_name: ''
+experiment_id: '395929558851043676'
+lifecycle_stage: active
+run_id: 1918181b354b4a0b98c08f764715ed52
+run_name: sneaky-kit-388
+run_uuid: 1918181b354b4a0b98c08f764715ed52
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1741086066657
+status: 3
+tags: []
+user_id: thuang
