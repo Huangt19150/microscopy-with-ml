@@ -1,0 +1,1 @@
+GT mask design is optimized based on sanity check against Raw masks. Specifically, gt mask **v2** allows better label/object reconstruction (using watershed), resulting in ~0.98 mean average metrics against labels drawn directly from raw masks.

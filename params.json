@@ -12,5 +12,6 @@
     "learning_rate": 1e-4,
     "metrics_logger": "metrics_logger_2ch",
     "batch_size": 20,
-    "epochs": 1
+    "epochs": 1,
+    "save_predictions": false
 }

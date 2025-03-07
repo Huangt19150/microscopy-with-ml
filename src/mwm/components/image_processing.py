@@ -3,9 +3,9 @@ import cv2
 import numpy as np
 from skimage import measure
 from skimage.morphology import dilation, footprint_rectangle
+from skimage.segmentation import watershed
 from skimage.feature import canny
 
-import matplotlib.pyplot as plt
 
 def normalize_image(image):
     """
@@ -15,6 +15,7 @@ def normalize_image(image):
     """
 
     return (image - np.min(image)) / (np.max(image) - np.min(image))
+
 
 def get_contours(mask, dilation_size=2, scale_255=False):
 
@@ -31,6 +32,7 @@ def get_contours(mask, dilation_size=2, scale_255=False):
         contour_mask = contour_mask * 255
 
     return contour_mask
+
 
 def get_split_contours(label, dilation_size_1=1, dilation_size_2=1, dilation_size_3=3, scale_255=False):
     """
@@ -59,15 +61,17 @@ def get_split_contours(label, dilation_size_1=1, dilation_size_2=1, dilation_siz
 
     return split_contours
 
+
 def get_gt_mask_png(label, dilation_size_1=1, dilation_size_2=1, dilation_size_3=3, save_path=None):
 
     split_contours = get_split_contours(label, dilation_size_1, dilation_size_2, dilation_size_3)
 
-    object_mask_sub_splits = (label > 0).astype(float) * (split_contours==0)
+    # object_mask_sub_splits = (label > 0).astype(float) * (split_contours==0) # GT mask v1
+    object_mask_full = (label > 0).astype(float) # GT mask v2
 
-    # NOTE: might be just for visualization of PNG - remove during training
+    # NOTE: room for adding a 3rd channel - first channel removed in training class
     empty_channel = np.zeros_like(label)
-    png = np.stack([empty_channel, split_contours, object_mask_sub_splits], axis=-1)
+    png = np.stack([empty_channel, split_contours, object_mask_full], axis=-1)
 
     if save_path:
         pass
@@ -84,3 +88,23 @@ def read_image_png(image_path):
             print(f"OpenCV could not read: {image_path}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
     return image
+
+
+def post_processing_watershed_2ch(prediction):
+    """
+    Args:
+        - prediction: 2 channels, after thresholding (0/1 values), uint8
+    Output:
+        - segmentation: 1 channel, labelled objects
+    """
+    full_foreground = prediction[:,:,1]
+    splitlines = prediction[:,:,0]
+    # subtracted = np.maximum(full_foreground - splitlines, 0)
+    subtracted = (full_foreground > 0).astype(float) * (splitlines==0)
+    marker = measure.label(subtracted, background=0)
+    segmentation = watershed(
+        -subtracted,
+        marker,
+        mask=full_foreground
+    )
+    return segmentation
