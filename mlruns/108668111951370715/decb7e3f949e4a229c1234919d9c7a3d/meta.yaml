@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/thuang/Documents/Personal/code/microscopy-with-ml/mlruns/108668111951370715/decb7e3f949e4a229c1234919d9c7a3d/artifacts
+end_time: 1741370703207
+entry_point_name: ''
+experiment_id: '108668111951370715'
+lifecycle_stage: active
+run_id: decb7e3f949e4a229c1234919d9c7a3d
+run_name: trial-0
+run_uuid: decb7e3f949e4a229c1234919d9c7a3d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1741368529867
+status: 3
+tags: []
+user_id: thuang

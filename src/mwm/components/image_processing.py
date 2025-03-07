@@ -99,7 +99,7 @@ def post_processing_watershed_2ch(prediction):
     """
     full_foreground = prediction[:,:,1]
     splitlines = prediction[:,:,0]
-    # subtracted = np.maximum(full_foreground - splitlines, 0)
+    # subtracted = np.maximum(full_foreground - splitlines, 0) # This is not working as expected
     subtracted = (full_foreground > 0).astype(float) * (splitlines==0)
     marker = measure.label(subtracted, background=0)
     segmentation = watershed(

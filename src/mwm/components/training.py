@@ -99,7 +99,7 @@ class Training:
             batch_progress_bar.set_postfix(loss=loss.item(), ram_used=f"{ram_used:.2f} GB", cpu_usage=f"{psutil.cpu_percent()}%")
 
         self.metrics_logger.update_mean(len(self.train_loader), len(self.train_dataset))
-        self.metrics_logger.log_metrics_mlflow(self.this_epoch) # Logger is reset afterwards
+        self.metrics_logger.log_metrics_mlflow(self.this_epoch+1) # Logger is reset afterwards
 
 
     def train(self, save_model=False, save_interval=10):
@@ -118,8 +118,8 @@ class Training:
         self.model.train()
 
         # Start training
+        mlflow.set_experiment("Training")
         with mlflow.start_run():
-            mlflow.set_experiment("Training")
             for epoch in range(self.params.epochs):
                 self.this_epoch = epoch
                 self.train_epoch()
