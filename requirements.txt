@@ -22,7 +22,8 @@ pandas==2.2.3
 tqdm==4.67.1
 matplotlib==3.10.0
 seaborn==0.13.2
-# albumentations==1.3.1  # Advanced augmentations
+albumentations==2.0.5
+optuna==4.2.1
 # timm==0.9.10  # Pretrained models
 # einops==0.7.0  # Transformer-based models
 

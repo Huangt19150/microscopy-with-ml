@@ -37,10 +37,10 @@ class EvaluationProcessor2Channel:
 
     def update_metrics(self):
         iou_matrix = iou_object_labels(self.labels_gt, self.labels_pred)
-        if iou_matrix.shape[0] > 0:
-            mean_object_iou = np.max(iou_matrix, axis=0).mean()
-        else:
+        if iou_matrix.size == 0:
             mean_object_iou = 0.0
+        else:
+            mean_object_iou = np.max(iou_matrix, axis=0).mean()
         
         # Calculate F1 score at all thresholds
         for t in self.thresholds:

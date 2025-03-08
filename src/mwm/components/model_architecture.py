@@ -4,7 +4,7 @@ from mwm import logger
 # Utils for model architecture
 def make_model(network_name):
     if network_name == "unet_resnet34_2ch":
-        model = smp.Unet(encoder_name="resnet34", encoder_weights="imagenet", in_channels=3, classes=2)
+        model = smp.Unet(encoder_name="resnet34", encoder_weights="imagenet", in_channels=3, classes=2, activation="sigmoid")
         logger.info(f"Model: {network_name} successfully created. ")
         return model
     else:

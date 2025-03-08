@@ -14,5 +14,5 @@
     "batch_size": 20,
     "epochs": 10,
     "model_file_path": "",
-    "save_predictions": false
+    "save_predictions": true
 }

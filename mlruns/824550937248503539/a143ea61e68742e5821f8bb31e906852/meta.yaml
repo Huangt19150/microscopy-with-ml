@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/thuang/Documents/Personal/code/microscopy-with-ml/mlruns/824550937248503539/a143ea61e68742e5821f8bb31e906852/artifacts
+end_time: 1741449762514
+entry_point_name: ''
+experiment_id: '824550937248503539'
+lifecycle_stage: active
+run_id: a143ea61e68742e5821f8bb31e906852
+run_name: resnet50_swsl
+run_uuid: a143ea61e68742e5821f8bb31e906852
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1741449762183
+status: 3
+tags: []
+user_id: thuang
