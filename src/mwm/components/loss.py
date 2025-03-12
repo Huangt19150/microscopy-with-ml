@@ -28,6 +28,8 @@ class WeightedDiceBCELoss(torch.nn.Module):
         # Apply sigmoid activation
         probs = torch.sigmoid(logits)
 
+        # TODO: determine channel identity first. Keep the order consistent with pre/post-processing
+
         # Apply class weights (higher weight for class 1)
         weights_obj = torch.where(targets[:,1,:,:] == 1, self.weight_object_foreground, 1.0)
         weights_bnd = torch.where(targets[:,0,:,:] == 1, self.weight_boundary_foreground, 1.0)

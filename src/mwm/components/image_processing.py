@@ -71,6 +71,9 @@ def get_gt_mask_png(label, dilation_size_1=1, dilation_size_2=1, dilation_size_3
 
     # NOTE: room for adding a 3rd channel - first channel removed in training class
     empty_channel = np.zeros_like(label)
+
+    # NOTE: If putting the object_mask_full first help taking the most advantage of pretrained weights?
+    #  - No. The 2 channels has no distinction from the pretrained model's perspective: result is pretty random.
     png = np.stack([empty_channel, split_contours, object_mask_full], axis=-1)
 
     if save_path:
@@ -97,8 +100,10 @@ def post_processing_watershed_2ch(prediction):
     Output:
         - segmentation: 1 channel, labelled objects
     """
+
     full_foreground = prediction[:,:,1]
     splitlines = prediction[:,:,0]
+
     # subtracted = np.maximum(full_foreground - splitlines, 0) # This is not working as expected
     subtracted = (full_foreground > 0).astype(float) * (splitlines==0)
     marker = measure.label(subtracted, background=0)
