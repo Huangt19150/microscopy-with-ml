@@ -6,7 +6,7 @@ def main():
     trainer.handle_device()
     trainer.make_criterion()
     trainer.make_optimizer()
-    trainer.train(save_model=True, save_interval=10)
+    trainer.train() # save_model=True, save_interval=10)
 
 if __name__ == "__main__":
     main()

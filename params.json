@@ -1,5 +1,11 @@
 {
     "network": "unet_resnet34_2ch",
+    "image_size_lut": {
+        "unet_resnet34_2ch": [
+            288,
+            288
+        ]
+    },
     "dataset": "seg_2ch",
     "loss": "weighted_dice_bce_2ch",
     "weighted_dice_bce_2ch": {
@@ -11,8 +17,9 @@
     "optimizer": "adam",
     "learning_rate": 1e-4,
     "metrics_logger": "metrics_logger_2ch",
+    "num_training_samples": 20,
     "batch_size": 20,
     "epochs": 10,
     "model_file_path": "",
-    "save_predictions": true
+    "save_predictions": false
 }

@@ -2,14 +2,21 @@ import os
 import cv2
 import torch
 from torch.utils.data import Dataset
+import albumentations as A
 from mwm.components.image_processing import normalize_image, get_gt_mask_png, read_image_png
 from mwm import logger
 
 
 # Utils for custom datasets
-def make_dataset(dataset_name, image_dir, mask_dir, image_list):
+def make_dataset(dataset_name, image_dir, mask_dir, image_list, image_size=[256, 256]):
     if dataset_name == "seg_2ch":
-        dataset = Seg2ChannelDataset(image_dir, mask_dir, image_list)
+        transform = A.Compose([
+            A.RandomCrop(width=image_size[0], height=image_size[1]),
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.RandomRotate90(p=0.5)
+        ]) # image was already normalized so the values should make sense even if not covering the whole [0,1] range in each crop
+        dataset = Seg2ChannelDataset(image_dir, mask_dir, image_list, transform)
         logger.info(f"Dataset: {dataset_name} successfully processed. ")
         return dataset
     else:
@@ -23,7 +30,7 @@ class Seg2ChannelDataset(Dataset):
         self.image_dir = image_dir
         self.mask_dir = mask_dir
         self.image_list = image_list # This is when image_list is pre-selected for train/val/test split
-        self.transform = transform # TODO:
+        self.transform = transform
 
         # For info retrieval where needed (e.g. at evaluation)
         self.this_image_path = ""
@@ -50,8 +57,20 @@ class Seg2ChannelDataset(Dataset):
         # mask = np.expand_dims(mask, axis=-1)  # Add channel dimension
         # mask = mask / 255.0  # Normalize (Assuming mask values are 0 or 255)
 
+        if self.transform:
+            augmented = self.transform(image=image, mask=mask)
+            image = augmented["image"]
+            mask = augmented["mask"]
+
         image = torch.tensor(image, dtype=torch.float32).permute(2, 0, 1)
         mask = torch.tensor(mask, dtype=torch.float32).permute(2, 0, 1)
+
+        # TODO: remove 
+        # import matplotlib.pyplot as plt
+        # fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+        # fig.colorbar(ax[0].imshow(image[0,:,:]))
+        # fig.colorbar(ax[1].imshow(mask[1,:,:]))
+        # plt.show()
 
         return image, mask
     

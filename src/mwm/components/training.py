@@ -37,10 +37,13 @@ class Training:
         # Make dataset
         self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
         self.mask_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir)
-        # TODO: update with cross-validation
+        self.image_size = self.params.image_size_lut[self.params.network]
+
+        # TODO: update with cross-validation        
         with open(os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.training_set_file), "r") as f:
-            self.image_list_train = f.read().splitlines()
-        self.train_dataset = make_dataset(self.params.dataset, self.image_dir, self.mask_dir, self.image_list_train)
+            self.image_list_train = f.read().splitlines()[:self.params.num_training_samples]
+
+        self.train_dataset = make_dataset(self.params.dataset, self.image_dir, self.mask_dir, self.image_list_train, self.image_size)
 
 
     def handle_device(self):
@@ -78,11 +81,6 @@ class Training:
 
         for images, masks in batch_progress_bar:
             images, masks = images.to(self.device), masks.to(self.device)
-
-            # TODO: move to Dataset
-            # Pad images to match the target size
-            images = self.pad_images(images)
-            masks = self.pad_images(masks)
 
             self.optimizer.zero_grad()  # Reset gradients
             outputs = self.model(images)  # Forward pass
@@ -141,18 +139,4 @@ class Training:
         mlflow.log_param(f"model_epoch{self.this_epoch+1}_path", save_path)
 
         logger.info(f"Model saved successfully! Location: {save_path}")
-
-
-    # TODO: do this in Dataset: use crop and set image_size as a param
-    @staticmethod
-    def pad_images(images, target_height=544, target_width=704):
-        """
-        (Move to Dataset class and consider more flexible resizing options: crop, etc.)
-        """
-        import torch.nn.functional as F
-        height, width = images.shape[-2], images.shape[-1]
-        pad_height = target_height - height
-        pad_width = target_width - width
-        padding = (0, pad_width, 0, pad_height, 0, 0)  # (left, right, top, bottom)
-        return F.pad(images, padding, mode='constant', value=0)
     
