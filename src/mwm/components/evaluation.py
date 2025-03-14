@@ -98,7 +98,7 @@ class Evaluator():
             logger.error(f"Check if model file ends with '.pth'. Invalid model file: {self.model_path}")
             raise ValueError(f"Invalid model file: {self.model_path}")
         
-        self.model = make_model(self.params.network)
+        self.model = make_model(self.params.network, encoder_weights=None)
         self.model.load_state_dict(torch.load(self.model_path))
         logger.info(f"Model loaded from: {self.model_path}")
 

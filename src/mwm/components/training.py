@@ -32,7 +32,7 @@ class Training:
         self.params = load_json(params_filepath)
 
         # Make model
-        self.model = make_model(self.params.network)
+        self.model = make_model(self.params.network, self.params.encoder_weights)
 
         # Make dataset
         self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
