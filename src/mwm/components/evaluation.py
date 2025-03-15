@@ -8,6 +8,7 @@ import mlflow
 from mwm import logger
 from mwm.constants import *
 from mwm.utils.common import read_yaml, load_json
+from mwm.config.configuration import get_params
 from mwm.components.model_architecture import *
 from mwm.components.dataset import *
 from mwm.components.image_processing import read_image_png, post_processing_watershed_2ch
@@ -86,7 +87,7 @@ class Evaluator():
         params_filepath = PARAMS_FILE_PATH,
     ):
         self.config = read_yaml(config_filepath)
-        self.params = load_json(params_filepath)
+        self.params = get_params(params_filepath, "evaluation")
 
         # Make & load model
         self.model_path = self.params.model_file_path
@@ -105,7 +106,6 @@ class Evaluator():
         # Make dataset
         self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
         self.mask_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir)
-        self.image_size = self.params.image_size_lut[self.params.network]
 
         with open(os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.test_set_file), "r") as f:
             self.image_list_test = f.read().splitlines()
@@ -115,7 +115,7 @@ class Evaluator():
             self.mask_dir, 
             self.image_list_test,
             "test", # TODO: test-time augmentation in dataset.py
-            self.image_size
+            self.params.image_size
         )
 
         # Make save path (optional)

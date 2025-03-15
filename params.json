@@ -1,38 +1,45 @@
 {
-    "network": "unet_efficientnet_b2_2ch",
-    "encoder_weights": "imagenet",
-    "image_size_lut": {
-        "unet_resnet34_2ch": [
-            288,
-            288
-        ],
-        "unet_efficientnet_b0_2ch": [
-            256,
-            256
-        ],
-        "unet_efficientnet_b2_2ch": [
-            256,
-            256
-        ],
-        "unet_efficientnet_b3_2ch": [
-            256,
-            256
-        ]
+    "common": {
+        "network": "unet_efficientnet_b3_2ch",
+        "encoder_weights": "imagenet",
+        "dataset": "seg_2ch",
+        "image_size_lut": {
+            "unet_resnet34_2ch": [
+                288,
+                288
+            ],
+            "unet_efficientnet_b0_2ch": [
+                256,
+                256
+            ],
+            "unet_efficientnet_b2_2ch": [
+                256,
+                256
+            ],
+            "unet_efficientnet_b3_2ch": [
+                256,
+                256
+            ]
+        }
     },
-    "dataset": "seg_2ch",
-    "loss": "weighted_dice_bce_2ch",
-    "weighted_dice_bce_2ch": {
-        "weight_1": 4.0,
-        "weight_2": 333.3,
-        "weight_3": 1.0,
-        "bce_weight": 1.0
+    "training": {
+        "batch_size": 20,
+        "steps_per_epoch": 10,
+        "learning_rate": 1e-4,
+        "epochs": 10,
+        "loss": "weighted_dice_bce_2ch",
+        "weighted_dice_bce_2ch": {
+            "weight_1": 4.0,
+            "weight_2": 333.3,
+            "weight_3": 1.0,
+            "bce_weight": 1.0
+        },
+        "optimizer": "adam",
+        "metrics_logger": "metrics_logger_2ch",
+        "num_training_samples": 98
     },
-    "optimizer": "adam",
-    "learning_rate": 1e-3,
-    "metrics_logger": "metrics_logger_2ch",
-    "num_training_samples": 98,
-    "batch_size": 98,
-    "epochs": 10,
-    "model_file_path": "",
-    "save_predictions": false
+    "evaluation": {
+        "model_file_path": "",
+        "save_predictions": false
+    }
 }

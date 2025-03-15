@@ -4,6 +4,7 @@ import psutil
 from datetime import datetime
 from mwm.constants import *
 from mwm.utils.common import read_yaml, load_json
+from mwm.config.configuration import get_params
 from mwm import logger
 
 # Model architecture
@@ -29,7 +30,7 @@ class Training:
         params_filepath = PARAMS_FILE_PATH
     ):
         self.config = read_yaml(config_filepath)
-        self.params = load_json(params_filepath)
+        self.params = get_params(params_filepath, "training")
 
         # Make model
         self.model = make_model(self.params.network, self.params.encoder_weights)
@@ -37,7 +38,6 @@ class Training:
         # Make dataset
         self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
         self.mask_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir)
-        self.image_size = self.params.image_size_lut[self.params.network]
 
         # TODO: update with cross-validation
         # - Train dataset
@@ -50,7 +50,7 @@ class Training:
             self.mask_dir, 
             self.image_list_train, 
             "train",
-            self.image_size
+            self.params.image_size
         )
 
         # - Validation dataset
@@ -63,7 +63,7 @@ class Training:
             self.mask_dir,
             self.image_list_val,
             "val",
-            self.image_size
+            self.params.image_size
         )
 
 
@@ -98,12 +98,13 @@ class Training:
 
     def train_epoch(self):
 
-        batch_progress_bar = tqdm(self.train_loader, desc=f"Epoch {self.this_epoch}/{self.params.epochs-1}", leave=True)
+        batch_progress_bar = tqdm(range(self.params.steps_per_epoch), desc=f"Epoch {self.this_epoch}/{self.params.epochs-1}", leave=True)
 
         ### Training Phase ###
         self.model.train()
 
-        for images, masks in batch_progress_bar:
+        for step in batch_progress_bar:
+            images, masks = next(iter(self.train_loader))
             images, masks = images.to(self.device), masks.to(self.device)
 
             self.optimizer.zero_grad()  # Reset gradients
@@ -120,7 +121,10 @@ class Training:
 
             batch_progress_bar.set_postfix(loss=loss.item(), ram_used=f"{ram_used:.2f} GB", cpu_usage=f"{psutil.cpu_percent()}%")
 
-        self.metrics_logger.update_mean(len(self.train_loader), len(self.train_dataset))
+        self.metrics_logger.update_mean(
+            self.params.steps_per_epoch,
+            self.params.steps_per_epoch * self.params.batch_size
+        )
 
         ### Validation Phase ###
         self.model.eval()
