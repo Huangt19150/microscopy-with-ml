@@ -1,0 +1,1 @@
+{'unet_resnet34_2ch': [288, 288], 'unet_efficientnet_b0_2ch': [256, 256], 'unet_efficientnet_b2_2ch': [256, 256], 'unet_efficientnet_b3_2ch': [256, 256]}

@@ -1,5 +1,5 @@
 {
-    "network": "unet_efficientnet_b0_2ch",
+    "network": "unet_efficientnet_b2_2ch",
     "encoder_weights": "imagenet",
     "image_size_lut": {
         "unet_resnet34_2ch": [
@@ -28,11 +28,11 @@
         "bce_weight": 1.0
     },
     "optimizer": "adam",
-    "learning_rate": 1e-4,
+    "learning_rate": 1e-3,
     "metrics_logger": "metrics_logger_2ch",
-    "num_training_samples": 20,
-    "batch_size": 20,
-    "epochs": 1,
+    "num_training_samples": 98,
+    "batch_size": 98,
+    "epochs": 10,
     "model_file_path": "",
     "save_predictions": false
 }

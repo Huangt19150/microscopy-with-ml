@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/thuang/Documents/Personal/code/microscopy-with-ml/mlruns/108668111951370715/9c5d0b8d10e94221b155bf996a468dba/artifacts
+end_time: 1742043820103
+entry_point_name: ''
+experiment_id: '108668111951370715'
+lifecycle_stage: active
+run_id: 9c5d0b8d10e94221b155bf996a468dba
+run_name: thundering-smelt-16
+run_uuid: 9c5d0b8d10e94221b155bf996a468dba
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742042989206
+status: 3
+tags: []
+user_id: thuang
