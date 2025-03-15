@@ -7,15 +7,34 @@ from mwm.components.image_processing import normalize_image, get_gt_mask_png, re
 from mwm import logger
 
 
-# Utils for custom datasets
-def make_dataset(dataset_name, image_dir, mask_dir, image_list, image_size=[256, 256]):
-    if dataset_name == "seg_2ch":
-        transform = A.Compose([
+def _get_transform(image_size, mode):
+    if mode == "train":
+        return A.Compose([
             A.RandomCrop(width=image_size[0], height=image_size[1]),
             A.HorizontalFlip(p=0.5),
             A.VerticalFlip(p=0.5),
             A.RandomRotate90(p=0.5)
-        ]) # image was already normalized so the values should make sense even if not covering the whole [0,1] range in each crop
+        ])
+    elif mode == "val":
+        return A.Compose([
+            A.CenterCrop(width=image_size[0], height=image_size[1])
+        ])
+    elif mode == "test":
+        # TODO: make test-time augmentation
+        return A.Compose([
+            A.CenterCrop(width=image_size[0], height=image_size[1])
+        ])
+    else:
+        logger.error(f"Invalid mode: {mode}")
+        raise ValueError(f"Invalid mode: {mode}")
+
+
+# Utils for custom datasets
+def make_dataset(dataset_name, image_dir, mask_dir, image_list, mode, image_size=[256, 256]):
+
+    transform = _get_transform(image_size, mode)
+
+    if dataset_name == "seg_2ch":
         dataset = Seg2ChannelDataset(image_dir, mask_dir, image_list, transform)
         logger.info(f"Dataset: {dataset_name} successfully processed. ")
         return dataset

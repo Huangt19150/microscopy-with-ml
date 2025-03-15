@@ -12,6 +12,7 @@ dataset:
   image_dir: norm_images
   mask_dir: masks
   training_set_file: metadata/training.txt
+  validation_set_file: metadata/validation.txt
   test_set_file: metadata/test.txt
 
 

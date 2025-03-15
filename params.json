@@ -1,6 +1,6 @@
 {
-    "network": "unet_efficientnet_b3_2ch",
-    "encoder_weights": "advprop",
+    "network": "unet_efficientnet_b0_2ch",
+    "encoder_weights": "imagenet",
     "image_size_lut": {
         "unet_resnet34_2ch": [
             288,
@@ -32,7 +32,7 @@
     "metrics_logger": "metrics_logger_2ch",
     "num_training_samples": 20,
     "batch_size": 20,
-    "epochs": 10,
+    "epochs": 1,
     "model_file_path": "",
     "save_predictions": false
 }

@@ -105,9 +105,18 @@ class Evaluator():
         # Make dataset
         self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
         self.mask_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir)
+        self.image_size = self.params.image_size_lut[self.params.network]
+
         with open(os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.test_set_file), "r") as f:
             self.image_list_test = f.read().splitlines()
-        self.test_dataset = make_dataset(self.params.dataset, self.image_dir, self.mask_dir, self.image_list_test)
+        self.test_dataset = make_dataset(
+            self.params.dataset, 
+            self.image_dir, 
+            self.mask_dir, 
+            self.image_list_test,
+            "test", # TODO: test-time augmentation in dataset.py
+            self.image_size
+        )
 
         # Make save path (optional)
         if self.params.save_predictions:

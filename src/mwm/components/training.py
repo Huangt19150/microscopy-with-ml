@@ -39,11 +39,32 @@ class Training:
         self.mask_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir)
         self.image_size = self.params.image_size_lut[self.params.network]
 
-        # TODO: update with cross-validation        
+        # TODO: update with cross-validation
+        # - Train dataset
         with open(os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.training_set_file), "r") as f:
             self.image_list_train = f.read().splitlines()[:self.params.num_training_samples]
 
-        self.train_dataset = make_dataset(self.params.dataset, self.image_dir, self.mask_dir, self.image_list_train, self.image_size)
+        self.train_dataset = make_dataset(
+            self.params.dataset, 
+            self.image_dir, 
+            self.mask_dir, 
+            self.image_list_train, 
+            "train",
+            self.image_size
+        )
+
+        # - Validation dataset
+        with open(os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.validation_set_file), "r") as f:
+            self.image_list_val = f.read().splitlines()
+        
+        self.val_dataset = make_dataset(
+            self.params.dataset,
+            self.image_dir,
+            self.mask_dir,
+            self.image_list_val,
+            "val",
+            self.image_size
+        )
 
 
     def handle_device(self):
@@ -77,7 +98,10 @@ class Training:
 
     def train_epoch(self):
 
-        batch_progress_bar = tqdm(self.train_loader, desc=f"Epoch {self.this_epoch+1}/{self.params.epochs}", leave=True)
+        batch_progress_bar = tqdm(self.train_loader, desc=f"Epoch {self.this_epoch}/{self.params.epochs-1}", leave=True)
+
+        ### Training Phase ###
+        self.model.train()
 
         for images, masks in batch_progress_bar:
             images, masks = images.to(self.device), masks.to(self.device)
@@ -97,7 +121,25 @@ class Training:
             batch_progress_bar.set_postfix(loss=loss.item(), ram_used=f"{ram_used:.2f} GB", cpu_usage=f"{psutil.cpu_percent()}%")
 
         self.metrics_logger.update_mean(len(self.train_loader), len(self.train_dataset))
-        self.metrics_logger.log_metrics_mlflow(self.this_epoch+1) # Logger is reset afterwards
+
+        ### Validation Phase ###
+        self.model.eval()
+
+        batch_progress_bar = tqdm(self.val_loader, desc=f"Epoch {self.this_epoch}/{self.params.epochs-1} validation", leave=True)
+
+        with torch.no_grad():
+            for images, masks in batch_progress_bar:
+                images, masks = images.to(self.device), masks.to(self.device)
+                outputs = self.model(images)
+                loss = self.criterion(outputs, masks)
+
+                self.metrics_logger.update_sum_val(loss)
+
+                batch_progress_bar.set_postfix(val_loss=loss.item())
+        
+        self.metrics_logger.update_mean_val(len(self.val_loader))
+
+        self.metrics_logger.log_metrics_mlflow(self.this_epoch) # Logger is reset afterwards
 
 
     def train(self, save_model=False, save_interval=10):
@@ -109,11 +151,9 @@ class Training:
             logger.error(f"Invalid metrics logger: {self.params.metrics_logger}")
             raise ValueError(f"Invalid metrics logger: {self.params.metrics_logger}")
         
-        # Define train_loader
+        # Define data loaders
         self.train_loader = DataLoader(self.train_dataset, batch_size=self.params.batch_size, shuffle=True)
-
-        # Set model to training mode
-        self.model.train()
+        self.val_loader = DataLoader(self.val_dataset, batch_size=self.params.batch_size, shuffle=False)
 
         # Start training
         mlflow.set_experiment("Training")
@@ -133,10 +173,10 @@ class Training:
 
     def save_model(self):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        save_path = os.path.join(self.config.model.model_dir, f"model_epoch{self.this_epoch+1}_{timestamp}.pth")
+        save_path = os.path.join(self.config.model.model_dir, f"model_epoch{self.this_epoch}_{timestamp}.pth")
         torch.save(self.model.state_dict(), save_path)  # Save model weights
 
-        mlflow.log_param(f"model_epoch{self.this_epoch+1}_path", save_path)
+        mlflow.log_param(f"model_epoch{self.this_epoch}_path", save_path)
 
         logger.info(f"Model saved successfully! Location: {save_path}")
     
