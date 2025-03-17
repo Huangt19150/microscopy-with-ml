@@ -41,5 +41,3 @@ class ConfigurationManager:
 
         return data_ingestion_config
 
-if __name__ == "__main__":
-    get_training_params(PARAMS_FILE_PATH)

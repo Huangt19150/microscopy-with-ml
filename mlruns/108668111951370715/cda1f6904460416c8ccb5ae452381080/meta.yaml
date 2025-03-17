@@ -4,7 +4,7 @@ entry_point_name: ''
 experiment_id: '108668111951370715'
 lifecycle_stage: active
 run_id: cda1f6904460416c8ccb5ae452381080
-run_name: thundering-cat-759
+run_name: bs20-steps10-lr1e-4-netb3
 run_uuid: cda1f6904460416c8ccb5ae452381080
 source_name: ''
 source_type: 4
