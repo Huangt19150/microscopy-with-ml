@@ -22,10 +22,11 @@ class WeightedDiceBCELoss(torch.nn.Module):
     def forward(self, logits, targets):
         """
         Args:
-            logits: Raw model outputs (before sigmoid), shape (batch_size, 2, H, W)
+            logits: model outputs (assuming already sigmoid), shape (batch_size, 2, H, W)
             targets: Ground truth binary masks (0 or 1), shape (batch_size, 2, H, W)
         """
-        # Apply sigmoid activation
+        # (Apply sigmoid activation)
+        # NOTE: Careful not to do it twice or it will demage gradients
         probs = logits # torch.sigmoid(logits)
 
         # TODO: determine channel identity first. Keep the order consistent with pre/post-processing
