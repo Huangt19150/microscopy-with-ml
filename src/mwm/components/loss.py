@@ -26,7 +26,7 @@ class WeightedDiceBCELoss(torch.nn.Module):
             targets: Ground truth binary masks (0 or 1), shape (batch_size, 2, H, W)
         """
         # Apply sigmoid activation
-        probs = torch.sigmoid(logits)
+        probs = logits # torch.sigmoid(logits)
 
         # TODO: determine channel identity first. Keep the order consistent with pre/post-processing
 

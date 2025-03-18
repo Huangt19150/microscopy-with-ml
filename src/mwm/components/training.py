@@ -114,7 +114,7 @@ class Training:
             loss.backward()  # Backpropagation
             self.optimizer.step()  # Update weights
 
-            self.metrics_logger.update_sum(loss, outputs, masks)
+            self.metrics_logger.update_sum(loss, outputs.cpu(), masks.cpu())
 
             # Get CPU & RAM usage for display/monitoring
             ram_used = psutil.virtual_memory().used / 1024**3
