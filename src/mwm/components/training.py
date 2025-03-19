@@ -79,7 +79,11 @@ class Training:
                 weight_1=self.params.weighted_dice_bce_2ch.weight_1,
                 weight_2=self.params.weighted_dice_bce_2ch.weight_2,
                 weight_3=self.params.weighted_dice_bce_2ch.weight_3,
-                bce_weight=self.params.weighted_dice_bce_2ch.bce_weight
+                bce_weight=self.params.weighted_dice_bce_2ch.bce_weight,
+                use_focal=self.params.weighted_dice_bce_2ch.use_focal,
+                use_gradient_loss=self.params.weighted_dice_bce_2ch.use_gradient_loss,
+                focal_alpha=self.params.weighted_dice_bce_2ch.focal_alpha,
+                focal_gamma=self.params.weighted_dice_bce_2ch.focal_gamma
             )
             logger.info(f"Loss: {self.params.loss} selected. ")
         else:
