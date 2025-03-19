@@ -133,6 +133,10 @@ class WeightedDiceBCELoss(nn.Module):
     def gradient_loss(self, pred, target):
         pred = pred.unsqueeze(1)
         target = target.unsqueeze(1)
+
+        # Move sobel filter to the same device as input
+        self.sobel_filter = self.sobel_filter.to(pred.device)
+        
         pred_grad = self.sobel_filter(pred)
         target_grad = self.sobel_filter(target)
         return F.l1_loss(pred_grad, target_grad)
