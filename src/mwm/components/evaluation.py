@@ -100,7 +100,7 @@ class Evaluator():
             raise ValueError(f"Invalid model file: {self.model_path}")
         
         self.model = make_model(self.params.network, encoder_weights=None)
-        self.model.load_state_dict(torch.load(self.model_path))
+        self.model.load_state_dict(torch.load(self.model_path, map_location=torch.device("cpu")))
         logger.info(f"Model loaded from: {self.model_path}")
 
         # Make dataset
@@ -114,7 +114,7 @@ class Evaluator():
             self.image_dir, 
             self.mask_dir, 
             self.image_list_test,
-            "test", # TODO: test-time augmentation in dataset.py
+            "test", # TODO: test-time augmentation in dataset.py (crop and stitch)
             self.params.image_size
         )
 
@@ -143,8 +143,8 @@ class Evaluator():
                 mask_path = self.test_dataset.get_mask_path()
                 image = image.to(self.device)
 
-                # TODO: move to Dataset
-                # Pad images to match the target size
+                # NOTE: keep it for now to avoid error and vis prediction
+                # TODO: No padding is needed for the model but need to get patched predictions back into full-frame
                 image = self.pad_images(image)
 
                 # TODO: any potnetial issue with not using data loader?

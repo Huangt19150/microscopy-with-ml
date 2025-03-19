@@ -20,7 +20,7 @@ def _get_transform(image_size, mode):
             A.CenterCrop(width=image_size[0], height=image_size[1])
         ])
     elif mode == "test":
-        # TODO: make test-time augmentation
+        # TODO: make test-time augmentation: crop & stitch
         return A.Compose([
             A.CenterCrop(width=image_size[0], height=image_size[1])
         ])
