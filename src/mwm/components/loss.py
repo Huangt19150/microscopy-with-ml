@@ -14,9 +14,11 @@ class WeightedDiceBCELoss(nn.Module):
                  bce_weight=1.0, 
                  use_focal=False,
                  use_gradient_loss=False,
+                 use_dist_loss=False,
                  focal_alpha=0.25,
                  focal_gamma=2.0,
                  grad_weight=1.0,
+                 boundary_dist_weight=1.0,
                  epsilon=1e-6,
     ):
         """
@@ -47,6 +49,10 @@ class WeightedDiceBCELoss(nn.Module):
         # Gradient loss params
         self.use_gradient_loss = use_gradient_loss
         self.grad_weight = grad_weight
+
+        # Boundary distance weight
+        self.use_dist_loss = use_dist_loss
+        self.boundary_dist_weight = boundary_dist_weight
         
         # Sobel filter for gradient loss
         if use_gradient_loss:
@@ -58,7 +64,7 @@ class WeightedDiceBCELoss(nn.Module):
             self.sobel_filter.weight.data = sobel_kernel
             self.sobel_filter.requires_grad_(False)
 
-    def forward(self, logits, targets):
+    def forward(self, logits, targets, sdm_tensor):
         """
         Args:
             logits: model outputs (assuming sigmoid already applied), shape (B, 2, H, W)
@@ -100,10 +106,16 @@ class WeightedDiceBCELoss(nn.Module):
         if self.use_gradient_loss:
             grad_loss = self.gradient_loss(probs[:,0,:,:], targets[:,0,:,:])
 
+        # ----- Boundary Distance Loss -----
+        boundary_dist_loss = 0.0
+        if self.use_dist_loss:
+            boundary_dist_loss = torch.mean(probs[:,0,:,:] * sdm_tensor.to(probs.device))
+
         # ----- Total Loss -----
         total_loss = (self.weight_boundary_channel * boundary_channel_dice + object_channel_dice) + \
                      self.bce_weight * (self.weight_boundary_channel * boundary_bce + object_bce) + \
-                     self.grad_weight * grad_loss
+                     self.grad_weight * grad_loss + \
+                     self.boundary_dist_weight * boundary_dist_loss
 
         return total_loss
 

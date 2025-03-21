@@ -24,9 +24,9 @@
     },
     "training": {
         "batch_size": 20,
-        "steps_per_epoch": 1,
+        "steps_per_epoch": 5,
         "learning_rate": 1e-4,
-        "epochs": 1,
+        "epochs": 5,
         "loss": "weighted_dice_bce_2ch",
         "weighted_dice_bce_2ch": {
             "weight_1": 4.0,
@@ -34,9 +34,8 @@
             "weight_3": 1.0,
             "bce_weight": 1.0,
             "use_focal": false,
-            "use_gradient_loss": true,
-            "focal_alpha": 0.25,
-            "focal_gamma": 2.0
+            "use_gradient_loss": false,
+            "use_dist_loss": false
         },
         "optimizer": "adam",
         "metrics_logger": "metrics_logger_2ch",
