@@ -38,6 +38,7 @@ class Training:
         # Make dataset
         self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
         self.mask_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.mask_dir)
+        self.sdm_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.sdm_dir)
 
         # TODO: update with cross-validation
         # - Train dataset
@@ -47,7 +48,8 @@ class Training:
         self.train_dataset = make_dataset(
             self.params.dataset, 
             self.image_dir, 
-            self.mask_dir, 
+            self.mask_dir,
+            self.sdm_dir,
             self.image_list_train, 
             "train",
             self.params.image_size
@@ -61,6 +63,7 @@ class Training:
             self.params.dataset,
             self.image_dir,
             self.mask_dir,
+            self.sdm_dir,
             self.image_list_val,
             "val",
             self.params.image_size
@@ -79,7 +82,11 @@ class Training:
                 weight_1=self.params.weighted_dice_bce_2ch.weight_1,
                 weight_2=self.params.weighted_dice_bce_2ch.weight_2,
                 weight_3=self.params.weighted_dice_bce_2ch.weight_3,
-                bce_weight=self.params.weighted_dice_bce_2ch.bce_weight
+                bce_weight=self.params.weighted_dice_bce_2ch.bce_weight,
+                grad_weight=self.params.weighted_dice_bce_2ch.grad_weight,
+                use_focal=self.params.weighted_dice_bce_2ch.use_focal,
+                use_gradient_loss=self.params.weighted_dice_bce_2ch.use_gradient_loss,
+                use_dist_loss=self.params.weighted_dice_bce_2ch.use_dist_loss
             )
             logger.info(f"Loss: {self.params.loss} selected. ")
         else:
@@ -104,12 +111,12 @@ class Training:
         self.model.train()
 
         for step in batch_progress_bar:
-            images, masks = next(iter(self.train_loader))
-            images, masks = images.to(self.device), masks.to(self.device)
+            images, masks, sdms = next(iter(self.train_loader))
+            images, masks, sdms = images.to(self.device), masks.to(self.device), sdms.to(self.device)
 
             self.optimizer.zero_grad()  # Reset gradients
             outputs = self.model(images)  # Forward pass
-            loss = self.criterion(outputs, masks)  # Compute loss
+            loss = self.criterion(outputs, masks, sdms)  # Compute loss
 
             loss.backward()  # Backpropagation
             self.optimizer.step()  # Update weights
@@ -132,10 +139,10 @@ class Training:
         batch_progress_bar = tqdm(self.val_loader, desc=f"Epoch {self.this_epoch}/{self.params.epochs-1} validation", leave=True)
 
         with torch.no_grad():
-            for images, masks in batch_progress_bar:
-                images, masks = images.to(self.device), masks.to(self.device)
+            for images, masks, sdms in batch_progress_bar:
+                images, masks, sdms = images.to(self.device), masks.to(self.device), sdms.to(self.device)
                 outputs = self.model(images)
-                loss = self.criterion(outputs, masks)
+                loss = self.criterion(outputs, masks, sdms)
 
                 self.metrics_logger.update_sum_val(loss)
 

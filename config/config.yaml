@@ -1,24 +1,21 @@
 artifacts_root: artifacts
 
-
 data_ingestion:
   root_dir: artifacts/data_ingestion
-  source_URL: https://drive.google.com/file/d/1zO8G52xrdb5XXnkmYWjW4DdPLSWrQru4/view?usp=sharing
+  source_URL: https://drive.google.com/file/d/1sJNMyi8cKtC7riMB_PxkrV5E0OK0vNVO/view?usp=sharing
   local_data_file: artifacts/data_ingestion/data.zip
   unzip_dir: artifacts/data_ingestion
-
 
 dataset:
   image_dir: norm_images
   mask_dir: masks
+  sdm_dir: sdms
   training_set_file: metadata/training.txt
   validation_set_file: metadata/validation.txt
   test_set_file: metadata/test.txt
 
-
 model:
   model_dir: artifacts/models
-
 
 evaluation:
   evaluation_dir: artifacts/evaluation
