@@ -83,6 +83,7 @@ class Training:
                 weight_2=self.params.weighted_dice_bce_2ch.weight_2,
                 weight_3=self.params.weighted_dice_bce_2ch.weight_3,
                 bce_weight=self.params.weighted_dice_bce_2ch.bce_weight,
+                grad_weight=self.params.weighted_dice_bce_2ch.grad_weight,
                 use_focal=self.params.weighted_dice_bce_2ch.use_focal,
                 use_gradient_loss=self.params.weighted_dice_bce_2ch.use_gradient_loss,
                 use_dist_loss=self.params.weighted_dice_bce_2ch.use_dist_loss

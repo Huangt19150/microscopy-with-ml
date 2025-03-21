@@ -12,12 +12,12 @@ class WeightedDiceBCELoss(nn.Module):
                  weight_2=333.3, 
                  weight_3=1.0, 
                  bce_weight=1.0, 
+                 grad_weight=1.0,
                  use_focal=False,
                  use_gradient_loss=False,
                  use_dist_loss=False,
                  focal_alpha=0.25,
                  focal_gamma=2.0,
-                 grad_weight=1.0,
                  boundary_dist_weight=1.0,
                  epsilon=1e-6,
     ):
