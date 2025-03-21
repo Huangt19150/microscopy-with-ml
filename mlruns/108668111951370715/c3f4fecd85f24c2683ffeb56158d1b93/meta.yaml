@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/thuang/Documents/Personal/code/microscopy-with-ml/mlruns/108668111951370715/c3f4fecd85f24c2683ffeb56158d1b93/artifacts
+end_time: 1742578874631
+entry_point_name: ''
+experiment_id: '108668111951370715'
+lifecycle_stage: active
+run_id: c3f4fecd85f24c2683ffeb56158d1b93
+run_name: lyrical-ray-146
+run_uuid: c3f4fecd85f24c2683ffeb56158d1b93
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742578404224
+status: 3
+tags: []
+user_id: thuang

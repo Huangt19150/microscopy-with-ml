@@ -1,12 +1,20 @@
 {
     "common": {
-        "network": "unet_efficientnet_b3_2ch",
+        "network": "unet_resnet152_2ch",
         "encoder_weights": "imagenet",
         "dataset": "seg_2ch",
         "image_size_lut": {
             "unet_resnet34_2ch": [
                 288,
                 288
+            ],
+            "unet_resnet101_2ch": [
+                256,
+                256
+            ],
+            "unet_resnet152_2ch": [
+                256,
+                256
             ],
             "unet_efficientnet_b0_2ch": [
                 256,
@@ -19,21 +27,33 @@
             "unet_efficientnet_b3_2ch": [
                 256,
                 256
+            ],
+            "unet_efficientnet_b4_2ch": [
+                256,
+                256
+            ],
+            "unet_dpn92_2ch": [
+                256,
+                256
+            ],
+            "unet_inceptionresnetv2_2ch": [
+                256,
+                256
             ]
         }
     },
     "training": {
-        "batch_size": 20,
-        "steps_per_epoch": 5,
+        "batch_size": 5,
+        "steps_per_epoch": 1,
         "learning_rate": 1e-4,
-        "epochs": 5,
+        "epochs": 1,
         "loss": "weighted_dice_bce_2ch",
         "weighted_dice_bce_2ch": {
             "weight_1": 4.0,
             "weight_2": 333.3,
             "weight_3": 1.0,
             "bce_weight": 1.0,
-            "grad_weight": 2.0,
+            "grad_weight": 1.0,
             "use_focal": false,
             "use_gradient_loss": true,
             "use_dist_loss": false
