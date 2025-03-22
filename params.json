@@ -1,6 +1,6 @@
 {
     "common": {
-        "network": "unet_efficientformerv2_l_2ch",
+        "network": "unet_regnety_040_2ch",
         "encoder_weights": "imagenet",
         "dataset": "seg_2ch",
         "image_size_lut": {
@@ -75,10 +75,10 @@
         }
     },
     "training": {
-        "batch_size": 5,
-        "steps_per_epoch": 1,
+        "batch_size": 20,
+        "steps_per_epoch": 5,
         "learning_rate": 1e-4,
-        "epochs": 1,
+        "epochs": 5,
         "loss": "weighted_dice_bce_2ch",
         "weighted_dice_bce_2ch": {
             "weight_1": 4.0,

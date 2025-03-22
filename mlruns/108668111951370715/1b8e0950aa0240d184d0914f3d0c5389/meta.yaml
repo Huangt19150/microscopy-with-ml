@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/thuang/Documents/Personal/code/microscopy-with-ml/mlruns/108668111951370715/1b8e0950aa0240d184d0914f3d0c5389/artifacts
+end_time: 1742641843139
+entry_point_name: ''
+experiment_id: '108668111951370715'
+lifecycle_stage: active
+run_id: 1b8e0950aa0240d184d0914f3d0c5389
+run_name: bemused-duck-131
+run_uuid: 1b8e0950aa0240d184d0914f3d0c5389
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742641748514
+status: 3
+tags: []
+user_id: root
