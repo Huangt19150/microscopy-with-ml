@@ -21,6 +21,22 @@ def make_model(network_name, encoder_weights):
         model = smp.Unet(encoder_name="dpn92", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
     elif network_name == "unet_inceptionresnetv2_2ch":
         model = smp.Unet(encoder_name="inceptionresnetv2", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_regnety_040_2ch":
+        model = smp.Unet(encoder_name="tu-regnety_040", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_convnext_base_2ch":
+        model = smp.Unet(encoder_name="tu-convnext_base", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_convnextv2_base_2ch":
+        model = smp.Unet(encoder_name="tu-convnextv2_base", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_swinv2_small_window8_256_2ch":
+        model = smp.Unet(encoder_name="tu-swinv2_small_window8_256", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_edgenext_small_2ch":
+        model = smp.Unet(encoder_name="tu-edgenext_small", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_edgenext_base_2ch":
+        model = smp.Unet(encoder_name="tu-edgenext_base", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_efficientformerv2_s1_2ch":
+        model = smp.Unet(encoder_name="tu-efficientformerv2_s1", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
+    elif network_name == "unet_efficientformerv2_l_2ch":
+        model = smp.Unet(encoder_name="tu-efficientformerv2_l", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
     else:
         logger.error(f"Invalid network: {network_name}")
         raise ValueError(f"Invalid network: {network_name}")

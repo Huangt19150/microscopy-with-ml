@@ -1,6 +1,6 @@
 {
     "common": {
-        "network": "unet_resnet152_2ch",
+        "network": "unet_efficientformerv2_l_2ch",
         "encoder_weights": "imagenet",
         "dataset": "seg_2ch",
         "image_size_lut": {
@@ -39,6 +39,38 @@
             "unet_inceptionresnetv2_2ch": [
                 256,
                 256
+            ],
+            "unet_regnety_040_2ch": [
+                256,
+                256
+            ],
+            "unet_convnext_base_2ch": [
+                224,
+                224
+            ],
+            "unet_convnextv2_base_2ch": [
+                224,
+                224
+            ],
+            "unet_swinv2_small_window8_256_2ch": [
+                256,
+                256
+            ],
+            "unet_edgenext_small_2ch": [
+                256,
+                256
+            ],
+            "unet_edgenext_base_2ch": [
+                256,
+                256
+            ],
+            "unet_efficientformerv2_s1_2ch": [
+                224,
+                224
+            ],
+            "unet_efficientformerv2_l_2ch": [
+                224,
+                224
             ]
         }
     },
