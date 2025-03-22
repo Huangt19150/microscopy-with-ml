@@ -1,6 +1,6 @@
 {
     "common": {
-        "network": "unet_regnety_040_2ch",
+        "network": "unet_efficientnet_b3_2ch",
         "encoder_weights": "imagenet",
         "dataset": "seg_2ch",
         "image_size_lut": {

@@ -112,7 +112,8 @@ class Evaluator():
         self.test_dataset = make_dataset(
             self.params.dataset, 
             self.image_dir, 
-            self.mask_dir, 
+            self.mask_dir,
+            None, 
             self.image_list_test,
             "test", # TODO: test-time augmentation in dataset.py (crop and stitch)
             self.params.image_size
@@ -139,7 +140,7 @@ class Evaluator():
         # Evaluate individual sample without batching
         batch_progress_bar = tqdm(self.test_dataset, desc=f"Evaluation", leave=True)
         with torch.no_grad():
-            for image, _ in batch_progress_bar:
+            for image, _, _ in batch_progress_bar:
                 mask_path = self.test_dataset.get_mask_path()
                 image = image.to(self.device)
 

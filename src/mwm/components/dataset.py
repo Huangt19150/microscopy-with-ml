@@ -68,14 +68,17 @@ class Seg2ChannelDataset(Dataset):
     def __getitem__(self, idx):
         img_path = os.path.join(self.image_dir, self.image_list[idx])
         mask_path = os.path.join(self.mask_dir, self.image_list[idx]) # Assuming masks have the same name
-        sdm_path = os.path.join(self.sdm_dir, self.image_list[idx].replace(".png", ".npy")) # Assuming sdms have the same name
         self.this_image_path = img_path
         self.this_mask_path = mask_path
 
         # Read image and mask
         image = read_image_png(img_path)
         mask_raw = read_image_png(mask_path)
-        sdm = np.load(sdm_path) # load sdm as numpy array
+        if self.sdm_dir:
+            sdm_path = os.path.join(self.sdm_dir, self.image_list[idx].replace(".png", ".npy")) # Assuming sdms have the same name
+            sdm = np.load(sdm_path) # load sdm as numpy array
+        else:
+            sdm = np.zeros_like(mask_raw).astype(np.float32) # dummy sdm
 
         # Normalize & Convert to tensors
         image = image / 255.0  # when import from preprocessed image dir: /norm_images
