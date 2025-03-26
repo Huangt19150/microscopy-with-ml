@@ -1,0 +1,2 @@
+Denoising: a) fill-holes in Ch1, b) thin+dilate(3) on Ch0.
+

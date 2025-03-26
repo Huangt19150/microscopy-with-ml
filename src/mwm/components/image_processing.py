@@ -3,9 +3,10 @@ import cv2
 import numpy as np
 import math
 from skimage import measure
-from skimage.morphology import dilation, footprint_rectangle
+from skimage.morphology import dilation, footprint_rectangle, thin
 from skimage.segmentation import watershed
 from skimage.feature import canny
+from scipy import ndimage as ndi
 from patchify import patchify
 
 
@@ -115,6 +116,31 @@ def post_processing_watershed_2ch(prediction):
         mask=full_foreground
     )
     return segmentation
+
+
+def post_processing_denoise_2ch(prediction, dilation_size=3, erosion_size=3):
+    """
+    Args:
+        - prediction: <class 'numpy.ndarray'>, probabilities (float32), 2 channels
+        - erosion_size: <int>, size of the erosion kernel
+    Output:
+        - prediction: <class 'numpy.ndarray'>, 0 or 1 (uint8), 2 channels
+    """
+    prediction = prediction > 0.5 # boolean
+
+    # fill holes in ch1 (nuclei, full_foreground)
+    # (confirmed with IXMtest_N11_s4_w142A84EA3-47C3-4B49-B6CA-BBC6685BBE1E)
+    prediction[:,:,1] = ndi.binary_fill_holes(prediction[:,:,1])
+
+    # # erode ch0 (splitlines): not helpful
+    # kernel = np.ones((erosion_size, erosion_size), np.uint8)
+    # prediction[:,:,0] = cv2.erode(prediction[:,:,0].astype(np.uint8), kernel, iterations=1) # still boolean 
+
+    # # thin ch0 (splitlines) + dilation: not helpful
+    # prediction[:,:,0] = thin(prediction[:,:,0].astype(np.uint8))
+    # prediction[:,:,0] = dilation(prediction[:,:,0], footprint_rectangle((dilation_size, dilation_size)))
+
+    return prediction.astype(np.uint8)
 
 
 def pad_image_for_patching(image, patch_size, step):

@@ -2,6 +2,7 @@ from datetime import datetime
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
+import cv2
 from skimage import measure
 import mlflow
 
@@ -11,7 +12,11 @@ from mwm.utils.common import read_yaml, load_json
 from mwm.config.configuration import get_params
 from mwm.components.model_architecture import *
 from mwm.components.dataset import *
-from mwm.components.image_processing import read_image_png, post_processing_watershed_2ch
+from mwm.components.image_processing import (
+    read_image_png, 
+    post_processing_watershed_2ch, 
+    post_processing_denoise_2ch
+)
 from mwm.components.metrics import iou_object_labels, measures_at
 
 
@@ -24,8 +29,7 @@ class EvaluationProcessor2Channel:
     def prep_evaluation(self, prediction, mask_path):
         """
         Args:
-            - prediction: same # of channels as the mask, probability values, 
-                can accept with padding not removed -> will be removed by framing the mask
+            - prediction: after denoise operations
             - mask_path: path to the original
         """
 
@@ -35,11 +39,6 @@ class EvaluationProcessor2Channel:
         self.labels_gt = measure.label(mask_raw[:,:,0], background=0)
 
         # Prediction to label
-        # TODO: add denoising step before thresholding
-        # - fill holes
-        # ...
-        prediction = prediction[:mask_raw.shape[0], :mask_raw.shape[1]] # remove padding
-        prediction = (prediction > 0.5).astype(np.uint8)
         self.labels_pred = post_processing_watershed_2ch(prediction) # key post-processing logic
             
 
@@ -161,8 +160,9 @@ class Evaluator():
                 # Move to CPU and to numpy
                 output = output.cpu().numpy() # <class 'numpy.ndarray'>, shape: (9, 2, 256, 256)
 
-                # Prediction in probability, 2 channels, cut to original image size
+                # <class 'numpy.ndarray'>, probabilities, 2 channels, cut to original image size
                 output_stitched = self.test_dataset.transform.reconstruct_full_frame(output)
+                output_stitched = post_processing_denoise_2ch(output_stitched)
 
                 # Evaluate
                 self.evaluate_processor.prep_evaluation(output_stitched, mask_path)
@@ -171,9 +171,8 @@ class Evaluator():
                 if self.params.save_predictions:
                     save_path = os.path.join(self.save_dir, os.path.basename(mask_path))
 
-                    mask_pred_uint8 = (output_stitched > 0.5).astype(np.uint8)
-                    empty_channel = np.zeros_like(mask_pred_uint8[:,:,0])
-                    mask_pred_uint8 = np.stack([mask_pred_uint8[:,:,1], empty_channel, mask_pred_uint8[:,:,0]], axis=-1) * 255 # cv2 uses BGR
+                    empty_channel = np.zeros_like(output_stitched[:,:,0])
+                    mask_pred_uint8 = np.stack([output_stitched[:,:,1], empty_channel, output_stitched[:,:,0]], axis=-1) * 255 # cv2 uses BGR
                     cv2.imwrite(save_path, mask_pred_uint8)
 
         mlflow.set_experiment("Evaluation")
@@ -190,18 +189,4 @@ class Evaluator():
 
             mlflow.log_param("evaluation_save_path", save_path)
             mlflow.log_param("model_path", self.model_path)
-                
-
-    # TODO: do this in Dataset: use crop and set image_size as a param
-    @staticmethod
-    def pad_images(images, target_height=544, target_width=704):
-        """
-        (Move to Dataset class and consider more flexible resizing options: crop, etc.)
-        """
-        import torch.nn.functional as F
-        height, width = images.shape[-2], images.shape[-1]
-        pad_height = target_height - height
-        pad_width = target_width - width
-        padding = (0, pad_width, 0, pad_height, 0, 0)  # (left, right, top, bottom)
-        return F.pad(images, padding, mode='constant', value=0)
     

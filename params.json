@@ -95,7 +95,7 @@
         "num_training_samples": 98
     },
     "evaluation": {
-        "model_file_path": "artifacts/models/model_epoch14_20250322_144722.pth",
+        "model_file_path": "artifacts/models/model_epoch7_20250322_134031.pth",
         "save_predictions": true
     }
 }
