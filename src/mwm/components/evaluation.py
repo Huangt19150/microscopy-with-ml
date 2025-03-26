@@ -22,18 +22,25 @@ class EvaluationProcessor2Channel:
 
 
     def prep_evaluation(self, prediction, mask_path):
-        self.sample_name = os.path.basename(mask_path).split(".")[0]
+        """
+        Args:
+            - prediction: same # of channels as the mask, probability values, 
+                can accept with padding not removed -> will be removed by framing the mask
+            - mask_path: path to the original
+        """
 
-        # Convert orginal mask to label
+        # Mask to label
+        self.sample_name = os.path.basename(mask_path).split(".")[0]
         mask_raw = read_image_png(mask_path)
         self.labels_gt = measure.label(mask_raw[:,:,0], background=0)
 
-        # Convert prediction output to label: 
-        prediction = prediction.permute(1, 2, 0).cpu().numpy()
-        # TODO: add future denoising step before thresholding
+        # Prediction to label
+        # TODO: add denoising step before thresholding
+        # - fill holes
+        # ...
+        prediction = prediction[:mask_raw.shape[0], :mask_raw.shape[1]] # remove padding
         prediction = (prediction > 0.5).astype(np.uint8)
-        reconstruction = post_processing_watershed_2ch(prediction) # key post-processing logic
-        self.labels_pred = reconstruction[:mask_raw.shape[0], :mask_raw.shape[1]] # remove padding
+        self.labels_pred = post_processing_watershed_2ch(prediction) # key post-processing logic
             
 
     def update_metrics(self):
@@ -115,7 +122,7 @@ class Evaluator():
             self.mask_dir,
             None, 
             self.image_list_test,
-            "test", # TODO: test-time augmentation in dataset.py (crop and stitch)
+            "test",
             self.params.image_size
         )
 
@@ -140,29 +147,31 @@ class Evaluator():
         # Evaluate individual sample without batching
         batch_progress_bar = tqdm(self.test_dataset, desc=f"Evaluation", leave=True)
         with torch.no_grad():
-            for image, _, _ in batch_progress_bar:
+            for image, _, _ in batch_progress_bar: # e.g. image shape: torch.Size([3, 3, 3, 256, 256])
+
                 mask_path = self.test_dataset.get_mask_path()
-                image = image.to(self.device)
-
-                # NOTE: keep it for now to avoid error and vis prediction
-                # TODO: No padding is needed for the model but need to get patched predictions back into full-frame
-                image = self.pad_images(image)
-
-                # TODO: any potnetial issue with not using data loader?
-                image = image.to(self.device).unsqueeze(0)  # Add batch dimension
+                
+                # Handle device & batching
+                _, _, c, h, w = image.shape
+                image = image.reshape(-1, c, h, w).to(self.device) # torch.Size([9, 3, 256, 256]) 
 
                 # Get prediction
                 output = self.model(image).squeeze()
-            
+
+                # Move to CPU and to numpy
+                output = output.cpu().numpy() # <class 'numpy.ndarray'>, shape: (9, 2, 256, 256)
+
+                # Prediction in probability, 2 channels, cut to original image size
+                output_stitched = self.test_dataset.transform.reconstruct_full_frame(output)
+
                 # Evaluate
-                self.evaluate_processor.prep_evaluation(output, mask_path)
+                self.evaluate_processor.prep_evaluation(output_stitched, mask_path)
                 self.evaluate_processor.update_metrics()
 
                 if self.params.save_predictions:
                     save_path = os.path.join(self.save_dir, os.path.basename(mask_path))
 
-                    mask_pred = output.permute(1, 2, 0).cpu().numpy()
-                    mask_pred_uint8 = (mask_pred > 0.5).astype(np.uint8)
+                    mask_pred_uint8 = (output_stitched > 0.5).astype(np.uint8)
                     empty_channel = np.zeros_like(mask_pred_uint8[:,:,0])
                     mask_pred_uint8 = np.stack([mask_pred_uint8[:,:,1], empty_channel, mask_pred_uint8[:,:,0]], axis=-1) * 255 # cv2 uses BGR
                     cv2.imwrite(save_path, mask_pred_uint8)

@@ -4,11 +4,16 @@ import cv2
 import torch
 from torch.utils.data import Dataset
 import albumentations as A
-from mwm.components.image_processing import normalize_image, get_gt_mask_png, read_image_png
+from mwm.components.image_processing import (
+    normalize_image, 
+    get_gt_mask_png, 
+    read_image_png, 
+    TestTimeTransform
+)
 from mwm import logger
 
 
-def _get_transform(image_size, mode):
+def _get_transform(image_size, mode, overlap=0.1):
     if mode == "train":
         return A.Compose([
             A.RandomCrop(width=image_size[0], height=image_size[1]),
@@ -25,10 +30,7 @@ def _get_transform(image_size, mode):
         additional_targets={'sdm': 'mask'}
         )
     elif mode == "test":
-        # TODO: make test-time augmentation: crop & stitch
-        return A.Compose([
-            A.CenterCrop(width=image_size[0], height=image_size[1])
-        ])
+        return TestTimeTransform(width=image_size[0], height=image_size[1])
     else:
         logger.error(f"Invalid mode: {mode}")
         raise ValueError(f"Invalid mode: {mode}")
@@ -66,6 +68,17 @@ class Seg2ChannelDataset(Dataset):
 
 
     def __getitem__(self, idx):
+        """
+        Args:
+            idx (int): Index of the image to retrieve
+        Returns:
+            image (torch.Tensor): Image tensor of shape (C, H, W).
+                Each image only returns one "sample" during training and validation,
+                but multiple patches during testing:
+                (n_patches_h, n_patches_w, C, patch_h, patch_w)
+            mask (torch.Tensor): Mask tensor of shape (C, H, W)
+            sdm (torch.Tensor): SDM tensor of shape (1, H, W) (optional)
+        """
         img_path = os.path.join(self.image_dir, self.image_list[idx])
         mask_path = os.path.join(self.mask_dir, self.image_list[idx]) # Assuming masks have the same name
         self.this_image_path = img_path
@@ -93,16 +106,14 @@ class Seg2ChannelDataset(Dataset):
             mask = augmented["mask"]
             sdm = augmented["sdm"]
 
-        image = torch.tensor(image, dtype=torch.float32).permute(2, 0, 1)
-        mask = torch.tensor(mask, dtype=torch.float32).permute(2, 0, 1)
-        sdm = torch.tensor(sdm, dtype=torch.float32).unsqueeze(0)
-
-        # TODO: remove 
-        # import matplotlib.pyplot as plt
-        # fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-        # fig.colorbar(ax[0].imshow(image[0,:,:]))
-        # fig.colorbar(ax[1].imshow(mask[1,:,:]))
-        # plt.show()
+        if len(image.shape) == 5: # Test time
+            image = torch.tensor(image, dtype=torch.float32).permute(0, 1, -1, -3, -2)
+        else:
+            image = torch.tensor(image, dtype=torch.float32).permute(2, 0, 1)
+        if mask: # Test time doesn't have mask
+            mask = torch.tensor(mask, dtype=torch.float32).permute(2, 0, 1)
+        if sdm: # sdm is optional, depending on the loss in use
+            sdm = torch.tensor(sdm, dtype=torch.float32).unsqueeze(0)
 
         return image, mask, sdm
     
