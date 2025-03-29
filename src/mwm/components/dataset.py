@@ -110,9 +110,9 @@ class Seg2ChannelDataset(Dataset):
             image = torch.tensor(image, dtype=torch.float32).permute(0, 1, -1, -3, -2)
         else:
             image = torch.tensor(image, dtype=torch.float32).permute(2, 0, 1)
-        if mask: # Test time doesn't have mask
+        if mask is not None: # Test time doesn't have mask
             mask = torch.tensor(mask, dtype=torch.float32).permute(2, 0, 1)
-        if sdm: # sdm is optional, depending on the loss in use
+        if sdm is not None: # sdm is optional, depending on the loss in use
             sdm = torch.tensor(sdm, dtype=torch.float32).unsqueeze(0)
 
         return image, mask, sdm

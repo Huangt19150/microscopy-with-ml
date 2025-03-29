@@ -75,14 +75,14 @@
         }
     },
     "training": {
-        "batch_size": 20,
+        "batch_size": 80,
         "steps_per_epoch": 5,
         "learning_rate": 1e-4,
         "epochs": 5,
         "loss": "weighted_dice_bce_2ch",
         "weighted_dice_bce_2ch": {
-            "weight_1": 4.0,
-            "weight_2": 333.3,
+            "weight_1": 1.0,
+            "weight_2": 500.0,
             "weight_3": 1.0,
             "bce_weight": 1.0,
             "grad_weight": 1.0,

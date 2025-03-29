@@ -1,1 +1,0 @@
-{'weight_1': 4.0, 'weight_2': 333.3, 'weight_3': 1.0, 'bce_weight': 1.0, 'use_focal': True, 'use_gradient_loss': False, 'use_dist_loss': False}
