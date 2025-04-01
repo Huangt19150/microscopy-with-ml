@@ -1,0 +1,14 @@
+{
+    "network": "unet_efficientnet_b3_2ch",
+    "dataset": "seg_2ch",
+    "image_size": [
+        256,
+        256
+    ],
+    "model_path": "model/model.pth",
+    "example_images": [
+        [
+            "examples/IXMtest_A16_s2_w15AF20A10-82AE-48FA-AC50-7AE8AC3AA544.png"
+        ]
+    ]
+}

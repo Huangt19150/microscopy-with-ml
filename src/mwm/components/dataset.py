@@ -86,7 +86,10 @@ class Seg2ChannelDataset(Dataset):
 
         # Read image and mask
         image = read_image_png(img_path)
-        mask_raw = read_image_png(mask_path)
+        if os.path.exists(mask_path):
+            mask_raw = read_image_png(mask_path)
+        else: # inference time don't have mask
+            mask_raw = np.zeros_like(image).astype(np.uint8) # dummy mask
         if self.sdm_dir:
             sdm_path = os.path.join(self.sdm_dir, self.image_list[idx].replace(".png", ".npy")) # Assuming sdms have the same name
             sdm = np.load(sdm_path) # load sdm as numpy array

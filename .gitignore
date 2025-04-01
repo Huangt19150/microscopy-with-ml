@@ -181,6 +181,7 @@ artifacts/
 
 # ML models
 models/
+app/model/model.pth
 
 # Figures
 figures/
