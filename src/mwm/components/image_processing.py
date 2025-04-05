@@ -54,7 +54,6 @@ def get_split_contours(label, dilation_size_1=1, dilation_size_2=1, dilation_siz
     contour_mask = get_contours(mask_aggregated, dilation_size_2)
     split_contours = np.maximum((contour_label - contour_mask), 0)
 
-    # TODO: Remove noise segments / further dialation?
     split_contours = split_contours * (label > 0) # remove contours outside of objects
 
     split_contours = dilation(split_contours, footprint_rectangle((dilation_size_3, dilation_size_3)))

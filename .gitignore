@@ -184,7 +184,7 @@ models/
 app/model/model.pth
 
 # Figures
-figures/
+figures/private
 
 # MLflow runs:
 mlruns/108668111951370715/*/

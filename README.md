@@ -1,135 +1,82 @@
 # Microscopy Image Segmentation with Machine Learning  
-Work-in-progress project exploring state-of-the-art ML models for nuclei (cell body) segmentation in microscopy images.
-
-![sample-image](link_to_image_or_placeholder.png)
-
-
-## 🧬 Progress so far: try for yourself!
-[demo link]
+Work-in-progress project exploring state-of-the-art (SOTA) ML models for nuclei (cell body) segmentation in microscopy images.
+<p align="center">
+<img src="figures/headline_image.png" alt="" width="800"/>
+</p>
 
 
-## 🔍 Status Summary
+<!-- ## Progress so far: Try for yourself!
+🧬 [demo link]() -->
+
+
+## Status Summary
+
+<h4>🟢 Highlights</h4>  
 
 - Improved mask generation based on *watershed* method (Ref: [topcoders](https://www.kaggle.com/competitions/data-science-bowl-2018/discussion/54741))
+<p align="center">
+<img src="figures/mask_generation.png" alt="" width="800"/>
+</p>
 
-- Instance reconstruction using *watershed* method achieves 99% fidelity
-
-- Class imbalance: Minor class (*split-line*) is not learning effectively
-
-Although the current results are still underperforming a baseline reference, the repo documents methods, experiments, learnings, and future directions in this space.
-
-✅ Work in progress  
-✅ Research-focused  
-✅ Open to feedback and suggestions
+- Instance reconstruction using *watershed* method achieves 99% fidelity, and is not sensitive to the width of the *touching boundary*
+<p align="center">
+<img src="figures/label_reconstruction.png" alt="" width="800"/>
+</p>
 
 
-## Dive In
+<h4>🟠 Challenge</h4>
 
-### 📁 Dataset
+- Class imbalance: Minor class (*touching boundary between nuclei*) is not learning effectively (under investigation)
+<p align="center">
+<img src="figures/iou_learning_curve.png" alt="" height="300"/>
+&nbsp;&nbsp;&nbsp;
+<img src="figures/train_val_loss_curve.png" alt="" height="300"/>
+</p>
 
-- Name: ![BBBC039](https://bbbc.broadinstitute.org/BBBC039)
-- Size: [e.g. 10k+ labeled cell images]
-- Type: [e.g. fluorescence microscopy / histopathology slides / phase contrast]
-- Format: Images + labels in [CSV/JSON/etc.]
 
-[Include a link to the dataset or data loader code if public.]
+<h4>🔵 Current Model Performance</h4>
 
----
+- **0.78** Mean-average F1 score on a 50-image testset containing 5720 nuclei.
+    - F1 score is calculated on nuclei instance basis
+    - Average is across thresholds of nuclei instance IoU from 0.50 to 0.95 with a step size of 0.05
+    - Dataset and score calculation is consistant with Ref: [Caicedo et al. 2018](https://onlinelibrary.wiley.com/doi/10.1002/cyto.a.23863)
 
-## 🧪 Current Experiments
 
-| Model              | Augmentation       | Accuracy | F1 Score | Notes                          |
-|-------------------|--------------------|----------|----------|--------------------------------|
-| ResNet18 (baseline) | Horizontal flips    | 73.2%    | 0.702    | Initial baseline               |
-| EfficientNet-B0    | Flip + brightness   | 75.6%    | 0.715    | Slightly better generalization |
-| SimCLR (SSL)       | No labels           | TBD      | TBD      | Ongoing training               |
+Although the current results are still underperforming the above paper as a baseline, the goal of this project is to experiment better problem framing (mask design), and look to explore more SOTA model architectures on this Biomedical domain problem.
 
-🧠 Ideas in progress:
-- Self-supervised pretraining (SimCLR, BYOL)
-- Explainability with Grad-CAM
-- Cell segmentation with UNet
-- Class imbalance handling via focal loss
+🏷️ Work in progress  
+🏷️ Research-focused  
+🏷️ Open to feedback and suggestions
 
----
 
-## 📊 Evaluation Metrics
+## Learnings
+- CNN models  
+✅ Current best performing model is using **efficientnet_b3** backbone with a **Unet** architecture from [smp](https://smp.readthedocs.io/en/latest/models.html)
 
-- Accuracy, Precision, Recall, F1 Score
-- Confusion matrix
-- Grad-CAM visualizations (planned)
+- Transformer-style models  
+🔍 Transformer-style models performed poorly from my observation so far, mainly because of the early resolution reduction (1/4, 1/8,...) destroying local & fine feature like the *touching boundary between nuclei*.  
+🧠 Worth explore transformer-style model as pre-classifier? To triage different imaging modalities to tailored segmentation model as oppose to heavy model ensambling like [topcoders](https://www.kaggle.com/competitions/data-science-bowl-2018/discussion/54741)
 
----
 
-## 📈 Current Results
+## More Details
+See upcoming post
 
-📉 So far, none of the trained models outperform a basic [reference model or published baseline], but several hypotheses are being tested:
 
-- Label noise in dataset?
-- Underfitting due to resolution?
-- Class imbalance?
+## How to Run
 
-Model logs, experiments, and plots are tracked in `/notebooks` and `/logs`.
-
----
-
-## 🛠 How to Run
-
-Basic setup:
-
+Prepare environment:
 ```bash
-git clone https://github.com/your_username/microscopy-cv-wip.git
-cd microscopy-cv-wip
+python3.11 -m venv venv
+. venv/bin/activate
 pip install -r requirements.txt
-python train.py --config configs/resnet18.yaml
 ```
 
-To visualize results:
-
+Download data:
 ```bash
-jupyter notebook notebooks/eval_visualization.ipynb
+python main.py
 ```
----
 
-## 🧭 Roadmap
-
-- [ ] Improve classification metrics  
-- [ ] Add explainability layer (Grad-CAM)  
-- [ ] Integrate self-supervised backbone  
-- [ ] Segment cells (UNet prototype)  
-- [ ] Write blog post summarizing project  
-- [ ] Evaluate on external dataset for generalization  
-- [ ] Clean up data pipeline for reproducibility  
-- [ ] Package model for inference (ONNX or TorchScript)
-
----
-
-## 🤝 Contributions / Feedback
-
-This project is still exploratory. Feedback, ideas, or PRs are welcome—especially if you're interested in microscopy or biomedical computer vision.
-
-Feel free to:
-- Open an issue with suggestions or bugs
-- Start a discussion if you’re working on similar problems
-- Fork the repo and try your own experiments!
-
----
-
-## 📚 More Backgrounds & References
-
-- Why interested in nuclei segmentation - logical line
- - Nuclei segmentation remains to be very challenging, especially in histological images (e.g. whole slide image), and useful in various microscopic imaging modalities (fluorecent, bright-field, etc).
- - DSB 2018 was an interesting effort trying to generalize across multiple modalities, but the top-score still leaves big room for improvement, where great advance in recent years could potentially help with (ViT etc.)
- - Start from an "easier" - more homogenus dataset, apply a smart trick borrowed from the top-score solution from DSB 2018. This project aims at to replicate a successful baseline first, then generalized to more complex datasets.
-
-
-
-- ["Cell Classification using CNNs" – Smith et al. 2021]  
-- [Kaggle: HuBMAP Cell Segmentation Competition](https://www.kaggle.com/competitions/hubmap-organ-segmentation)  
-- [Papers with Code: Self-Supervised Learning on Microscopy Images](https://paperswithcode.com/task/microscopy-image-classification)  
-- ["Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization" – Selvaraju et al. 2017](https://arxiv.org/abs/1610.02391)
-
----
-
-## 🧾 License
-
-This project is licensed under the MIT License. See the LICENSE file for more details.
+Run training:
+```bash
+python train.py
+```
