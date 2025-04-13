@@ -5,8 +5,8 @@ Work-in-progress project exploring state-of-the-art (SOTA) ML models for nuclei 
 </p>
 
 
-<!-- ## Progress so far: Try for yourself!
-🧬 [demo link]() -->
+## Progress so far: Try for yourself!
+### 🔬[Microscopy with ML](https://huggingface.co/spaces/asphodel-thuang/microscopy-with-ml)
 
 
 ## Status Summary
