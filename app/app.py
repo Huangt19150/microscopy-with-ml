@@ -1,4 +1,9 @@
 import os
+import sys
+
+# NOTE: Deploy ONLY: Add the src directory to the Python path
+# sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
+
 from pathlib import Path
 from PIL import Image
 import gradio as gr
@@ -13,7 +18,7 @@ from mwm.components.visualization import (
 def segment(image: Image.Image):
 
     # Dump image
-    # TODO: add normalization
+    # TODO: add normalization before allow user to upload their own image
     image_savepath = "input_image.png"
     image.save(image_savepath)
 
@@ -31,9 +36,6 @@ def segment(image: Image.Image):
 
     return Image.fromarray(labels_pred_colored)
 
-# TODO: remove after local testing
-working_dir = "app"
-os.chdir(working_dir)
 
 # Load config
 config = load_json(Path("config.json"))
@@ -43,9 +45,22 @@ demo = gr.Interface(
     fn=segment,
     inputs=gr.Image(type="pil"),
     outputs=gr.Image(type="pil"),
-    title="PyTorch Image Segmentation Demo",
-    description="Upload an image or try one of the examples below to run nuclei segmentation.",
-    examples=config.example_images
+    title="🔬 Microscopy Image Segmentation with Machine Learning",
+    description="""
+    ## Work-in-progress project exploring state-of-the-art (SOTA) ML models for nuclei (cell body) segmentation in microscopy images. 
+    Check out full details in this repo: [microscopy-with-ml](https://github.com/Huangt19150/microscopy-with-ml)
+
+    ## 📋 Quick Start Guide:
+    1. Try one of the **examples** below to run nuclei segmentation.
+    2. (Upload your own image is not yet supported. Coming soon!)
+
+    ## 📖 Reference:
+    1. Dataset: [BBBC039v1](https://bbbc.broadinstitute.org/BBBC039) Caicedo et al. 2018, available from the Broad Bioimage Benchmark Collection [Ljosa et al., Nature Methods, 2012](https://www.nature.com/articles/nmeth.2083).
+    2. Method improved from [topcoders](https://www.kaggle.com/competitions/data-science-bowl-2018/discussion/54741)
+    
+    """,
+    examples=config.example_images,
+    allow_flagging="never"
 )
 
 if __name__ == "__main__":

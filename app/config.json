@@ -9,6 +9,12 @@
     "example_images": [
         [
             "examples/IXMtest_A16_s2_w15AF20A10-82AE-48FA-AC50-7AE8AC3AA544.png"
+        ],
+        [
+            "examples/IXMtest_F14_s7_w1E67F2A8A-EEC1-4F01-A1E2-0ECFC639637F.png"
+        ],
+        [
+            "examples/IXMtest_D08_s7_w1F476A544-A07C-4E9B-A6CB-BAEF4CD6F64E.png"
         ]
     ]
 }
