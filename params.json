@@ -75,19 +75,22 @@
         }
     },
     "training": {
-        "batch_size": 80,
-        "steps_per_epoch": 5,
+        "freeze_encoder_layers": [
+            "all"
+        ],
+        "batch_size": 20,
+        "steps_per_epoch": 10,
         "learning_rate": 1e-4,
-        "epochs": 5,
+        "epochs": 10,
         "loss": "weighted_dice_bce_2ch",
         "weighted_dice_bce_2ch": {
-            "weight_1": 1.0,
-            "weight_2": 500.0,
+            "weight_1": 4.0,
+            "weight_2": 333.3,
             "weight_3": 1.0,
             "bce_weight": 1.0,
             "grad_weight": 1.0,
             "use_focal": false,
-            "use_gradient_loss": true,
+            "use_gradient_loss": false,
             "use_dist_loss": false
         },
         "optimizer": "adam",

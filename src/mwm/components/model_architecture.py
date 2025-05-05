@@ -2,6 +2,24 @@ import segmentation_models_pytorch as smp
 from mwm import logger
 
 # Utils for model architecture
+def freeze_encoder(model, freeze_encoder_layers):
+    """
+    Freeze the encoder layers of the model.
+    """
+    if not freeze_encoder_layers: # list is empty
+        logger.info("No Encoder layer is frozen. All layers are trainable.")
+    elif freeze_encoder_layers[0] == "all": # freeze all layers
+        for param in model.encoder.parameters():
+            param.requires_grad = False
+        logger.info("All Encoder layers are frozen.")
+    else:
+        for name, child in model.encoder.named_children():
+            if name in freeze_encoder_layers:
+                for param in child.parameters():
+                    param.requires_grad = False
+        logger.info(f"Encoder layers: {freeze_encoder_layers} are selectively frozen.")
+
+
 def make_model(network_name, encoder_weights):
     if network_name == "unet_resnet34_2ch":
         model = smp.Unet(encoder_name="resnet34", encoder_weights=encoder_weights, in_channels=3, classes=2, activation="sigmoid")
@@ -42,6 +60,9 @@ def make_model(network_name, encoder_weights):
         raise ValueError(f"Invalid network: {network_name}")
 
     logger.info(f"Model: {network_name} successfully created. ")
+    print("Named children in Encoder:")
+    for name, _ in list(model.encoder.named_children()):
+        print(name)
     return model
 
 # Classes for customized model architecture

@@ -34,6 +34,7 @@ class Training:
 
         # Make model
         self.model = make_model(self.params.network, self.params.encoder_weights)
+        freeze_encoder(self.model, self.params.freeze_encoder_layers)
 
         # Make dataset
         self.image_dir = os.path.join(self.config.data_ingestion.unzip_dir, self.config.dataset.image_dir)
